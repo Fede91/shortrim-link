@@ -19,7 +19,7 @@ export async function POST(request: Request) {
   })
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
-    .setExpirationTime("30s")
+    .setExpirationTime("1h")
     .sign(getJwtSecretKey());
   const response = NextResponse.json(
     { success: true },
