@@ -1,9 +1,10 @@
-import type { Metadata } from "next";
+"use client";
+import { Toaster } from "@/components/ui/toaster";
 
-export const metadata: Metadata = {
-  title: "Authentication page",
-  description: "figma to next.js",
-};
+// export const metadata: Metadata = {
+//   title: "Authentication page",
+//   description: "figma to next.js",
+// };
 
 export default function AuthLayout({
   children,
@@ -17,6 +18,7 @@ export default function AuthLayout({
         {/* page content */}
         {children}
       </div>
+      <Toaster />
     </main>
   );
 }

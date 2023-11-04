@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 export const GET = async (request: Request) => {
   const shortlinks = await kv.json.get("__shortlinks");
 
-  console.log(shortlinks);
+  // console.log(shortlinks);
 
   return NextResponse.json(shortlinks || {}, {
     status: 200,
@@ -17,20 +17,32 @@ export const POST = async (request: Request) => {
 
   const pathExist = await kv.json.type("__shortlinks");
 
-  console.log(pathExist);
+  // console.log(pathExist);
 
   if (!pathExist) {
     await kv.json.set("__shortlinks", "$", {
       [key]: {
         url,
         visits: 0,
+        createdAt: new Date().getTime(),
       },
     });
   } else {
-    await kv.json.set("__shortlinks", "$." + key, {
-      url,
-      visits: 0,
-    });
+    // Check if the key is already exists
+    const currentKeyData = await kv.json.get("__shortlinks", "$." + key);
+
+    if (currentKeyData.length > 0) {
+      await kv.json.set("__shortlinks", "$." + key, {
+        ...currentKeyData[0],
+        url,
+      });
+    } else {
+      await kv.json.set("__shortlinks", "$." + key, {
+        url,
+        visits: 0,
+        createdAt: new Date().getTime(),
+      });
+    }
   }
 
   // TODO_1: Check if the key is already exists

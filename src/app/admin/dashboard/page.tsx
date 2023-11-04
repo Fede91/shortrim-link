@@ -3,8 +3,67 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MainNav } from "./components/main-nav";
 import { UserNav } from "./components/user-nav";
+import { DataTable } from "./components/data-table";
+import { ShortLink, getColumns } from "./components/columns";
+import { useEffect, useState } from "react";
+import { ShortLinkDialog } from "./components/shortlink-dialog";
 
 export default function DashboardPage() {
+  const [shortLinks, setShortLinks] = useState<ShortLink[]>([]);
+  const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
+  const [editShortLink, setEditShortLink] = useState<ShortLink | null>(null);
+
+  const fetchShortLinks = async () => {
+    try {
+      const response = await fetch("/api/shortlink", {
+        method: "GET",
+      });
+
+      const rawData: { [key: string]: { url: string; visits: number } } =
+        await response.json();
+
+      // format data
+      const data: ShortLink[] = Object.entries(rawData).map(([key, value]) => {
+        return {
+          key,
+          ...value,
+        };
+      });
+
+      setShortLinks(data);
+    } catch (error) {
+      window.alert(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchShortLinks();
+  }, []);
+
+  const handleSubmit = async (data: ShortLink) => {
+    try {
+      await fetch("/api/shortlink", {
+        method: "POST",
+        body: JSON.stringify(data),
+      });
+      setIsDialogOpen(false);
+      fetchShortLinks();
+    } catch (error) {
+      window.alert(error);
+    }
+  };
+
+  const handleEditClick = (key: ShortLink["key"]) => {
+    const shortLink = shortLinks.find((link) => link.key === key);
+
+    if (shortLink) {
+      setEditShortLink(shortLink);
+      setIsDialogOpen(true);
+    }
+  };
+
+  const columns = getColumns(handleEditClick);
+
   return (
     <div className="hidden flex-col md:flex">
       <div className="border-b">
@@ -19,7 +78,7 @@ export default function DashboardPage() {
         <div className="flex items-center justify-between space-y-2">
           <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
         </div>
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        {/* <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
@@ -119,7 +178,18 @@ export default function DashboardPage() {
               </p>
             </CardContent>
           </Card>
-        </div>
+        </div> */}
+        <DataTable
+          data={shortLinks}
+          columns={columns}
+          onOpenDialog={() => setIsDialogOpen(true)}
+        />
+        <ShortLinkDialog
+          open={isDialogOpen}
+          onSave={handleSubmit}
+          setIsOpen={setIsDialogOpen}
+          data={editShortLink}
+        />
       </div>
     </div>
   );
