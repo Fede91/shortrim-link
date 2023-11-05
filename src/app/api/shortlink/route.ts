@@ -1,10 +1,17 @@
+import { verifyJwtToken } from "@/lib/auth";
 import { kv } from "@vercel/kv";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
-export const GET = async (request: Request) => {
+export const GET = async (request: NextRequest) => {
+  const token = request.cookies.get("token")?.value;
+
+  const hasVerifiedToken = token && (await verifyJwtToken(token));
+
+  if (!hasVerifiedToken) {
+    return NextResponse.json({ success: false }, { status: 401 });
+  }
+
   const shortlinks = await kv.json.get("__shortlinks");
-
-  // console.log(shortlinks);
 
   return NextResponse.json(shortlinks || {}, {
     status: 200,
@@ -12,8 +19,16 @@ export const GET = async (request: Request) => {
   });
 };
 
-export const POST = async (request: Request) => {
+export const POST = async (request: NextRequest) => {
   const { key, url } = await request.json();
+
+  const token = request.cookies.get("token")?.value;
+
+  const hasVerifiedToken = token && (await verifyJwtToken(token));
+
+  if (!hasVerifiedToken) {
+    return NextResponse.json({ success: false }, { status: 401 });
+  }
 
   const pathExist = await kv.json.type("__shortlinks");
 
@@ -82,7 +97,15 @@ export const POST = async (request: Request) => {
   return NextResponse.json({ success: true }, { status: 200 });
 };
 
-export const DELETE = async (request: Request) => {
+export const DELETE = async (request: NextRequest) => {
+  const token = request.cookies.get("token")?.value;
+
+  const hasVerifiedToken = token && (await verifyJwtToken(token));
+
+  if (!hasVerifiedToken) {
+    return NextResponse.json({ success: false }, { status: 401 });
+  }
+
   await kv.json.del("__shortlinks");
 
   return NextResponse.json({ success: true }, { status: 200 });

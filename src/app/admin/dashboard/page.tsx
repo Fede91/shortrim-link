@@ -62,7 +62,24 @@ export default function DashboardPage() {
     }
   };
 
-  const columns = getColumns(handleEditClick);
+  const handleDeleteClick = async (key: ShortLink["key"]) => {
+    if (
+      window.confirm("Are you sure you want to delete this shortlink?") ===
+      false
+    ) {
+      return;
+    }
+    try {
+      await fetch(`/api/shortlink/${key}`, {
+        method: "DELETE",
+      });
+      fetchShortLinks();
+    } catch (error) {
+      window.alert(error);
+    }
+  };
+
+  const columns = getColumns(handleEditClick, handleDeleteClick);
 
   return (
     <div className="hidden flex-col md:flex">

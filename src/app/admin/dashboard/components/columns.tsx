@@ -11,7 +11,8 @@ export type ShortLink = {
 };
 
 export const getColumns = (
-  onEdit: (key: ShortLink["key"]) => void
+  onEdit: (key: ShortLink["key"]) => void,
+  onDelete: (key: ShortLink["key"]) => void
 ): ColumnDef<ShortLink>[] => [
   {
     accessorKey: "key",
@@ -37,6 +38,8 @@ export const getColumns = (
   },
   {
     id: "actions",
-    cell: ({ row }) => <DataTableRowActions row={row} onEdit={onEdit} />,
+    cell: ({ row }) => (
+      <DataTableRowActions row={row} onEdit={onEdit} onDelete={onDelete} />
+    ),
   },
 ];

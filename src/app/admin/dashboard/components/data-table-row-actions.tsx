@@ -7,7 +7,6 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
-  DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
@@ -18,11 +17,13 @@ import { ShortLink } from "./columns";
 interface DataTableRowActionsProps<TData> {
   row: Row<TData>;
   onEdit: (key: ShortLink["key"]) => void;
+  onDelete: (key: ShortLink["key"]) => void;
 }
 
 export function DataTableRowActions<TData>({
   row,
   onEdit,
+  onDelete,
 }: DataTableRowActionsProps<TData>) {
   const { toast } = useToast();
 
@@ -37,6 +38,11 @@ export function DataTableRowActions<TData>({
   const handlEditClick = () => {
     const key = row.getValue("key") as string;
     onEdit(key);
+  };
+
+  const handleDeleteClick = () => {
+    const key = row.getValue("key") as string;
+    onDelete(key);
   };
 
   return (
@@ -54,9 +60,9 @@ export function DataTableRowActions<TData>({
         <DropdownMenuItem onClick={handlEditClick}>Edit</DropdownMenuItem>
         <DropdownMenuItem onClick={handleCopyClick}>Copy link</DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>
+        <DropdownMenuItem onClick={handleDeleteClick}>
           Delete
-          <DropdownMenuShortcut>⌘⌫</DropdownMenuShortcut>
+          {/* <DropdownMenuShortcut>⌘⌫</DropdownMenuShortcut> */}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
