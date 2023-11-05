@@ -82,7 +82,7 @@ export default function DashboardPage() {
   const columns = getColumns(handleEditClick, handleDeleteClick);
 
   return (
-    <div className="hidden flex-col md:flex">
+    <div className="flex-col md:flex">
       <div className="border-b">
         <div className="flex h-16 items-center px-4">
           <MainNav className="mx-6" />
