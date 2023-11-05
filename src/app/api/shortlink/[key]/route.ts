@@ -1,9 +1,8 @@
 import { verifyJwtToken } from "@/lib/auth";
 import { kv } from "@vercel/kv";
-import { NextApiRequest } from "next";
 import { NextRequest, NextResponse } from "next/server";
 
-export const GET = async (request: NextApiRequest, { params }: any) => {
+export const GET = async (request: NextRequest, { params }: any) => {
   const { key } = params;
 
   const records = await kv.json.get("__shortlinks", "$." + key);
@@ -28,9 +27,8 @@ export const GET = async (request: NextApiRequest, { params }: any) => {
   });
 };
 
-export const DELETE = async (request: NextApiRequest, { params }: any) => {
-  // @ts-ignore
-  const token = request.cookies.get("token").value;
+export const DELETE = async (request: NextRequest, { params }: any) => {
+  const token = request.cookies.get("token")?.value;
 
   const hasVerifiedToken = token && (await verifyJwtToken(token));
 
